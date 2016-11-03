@@ -4,7 +4,7 @@
 
 ## 数据文件格式说明
 
-原始数据文件：`<title>.trep`.
+原始数据文件：`trep.dat`.
 
 每一行时间记录格式为：
 `time-string action-name page-position`.
@@ -24,12 +24,11 @@
 
 示例：
 ```
-$ cat fpp.trep
-Title: <book-title>
-Total Pages: xxx
+Title: Functional Python Programming
+Total Pages: 351
 Page Type: print
 
-Time Records:
+Action Records:
 ------
 2016-11-03T10:06:49.656754 start 12.7
 2016-11-03T11:06:49.656754 end 14.2
