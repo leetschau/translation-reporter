@@ -43,15 +43,21 @@ Action Records:
 ## Installation
 
 ```
-cd ~/apps
-git clone https://github.com/leetschau/translation-reporter.git
+git clone https://github.com/leetschau/translation-reporter.git ~/apps/translation-reporter
 sudo ln -s ~/apps/translation-reporter/trep.py /usr/local/bin/trep
 ```
 
 ## Usage
 
-* `trep rec`
+```
+cd /path/to/your/project
+cp ~/apps/translation-reporter/trep-sample.dat trep.dat
+```
 
-* `trep list`
+修改`trep.dat`中的书名、总页数、页码类型后，就可以使用了：
 
-* `trep report`
+* `trep r`: 开始计时，中间可以用`Ctrl-C`暂停；
+
+* `trep l`: 打印数据分析列表；
+
+* `trep rep`: 打印数据分析图表。

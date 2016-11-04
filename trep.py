@@ -75,27 +75,45 @@ class Recorder:
             self.add_action('finish', end_position)
 
 
-def print_list(inputfile):
-    pass
+class Calculator:
+    def __init__(self, datfile):
+        self.datafile = datfile
+
+    def get_speed(self):
+        pass
+
+    def get_page_count(self):
+        pass
+
+    def get_total_pages(self):
+        pass
 
 
-def draw_report(inputfile):
-    pass
+class Reporter:
+    def __init__(self, datfile):
+        self.datafile = datfile
+
+    def print_list(self):
+        pass
+
+
+    def print_report(self):
+        pass
 
 
 recorder = Recorder(DATA_FILE)
-parser = argparse.ArgumentParser(
-    description='Translation Reporter')
-parser.add_argument('action',
-                    help='rec/list/report')
+reporter = Reporter(DATA_FILE)
+
+parser = argparse.ArgumentParser(description='Translation Reporter')
+parser.add_argument('action', help='[r]ecord / [l]ist / [rep]ort')
 args = parser.parse_args()
 
-if args.action == 'rec':
+if args.action == 'r':
     recorder.start_recording()
-elif args.action == 'list':
-    print_list(DATAFILE)
-elif args.action == 'report':
-    draw_report(DATAFILE)
+elif args.action == 'l':
+    reporter.print_list()
+elif args.action == 'rep':
+    reporter.print_report()
 else:
     print('Bad command, list valid commands with "-h"')
 
