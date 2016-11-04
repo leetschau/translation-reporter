@@ -164,14 +164,14 @@ class Reporter:
             print()
         print('=== Pages by Day ===')
         print(self.pages_group('display_day'))
-        print('=== Pages by Week ===')
-        print(self.pages_group('display_week'))
-        print('=== Pages by Month ===')
-        print(self.pages_group('display_month'))
         print('=== Finished Pages by Day ===')
         print(self.finished_pages('display_day'))
+        print('=== Pages by Week ===')
+        print(self.pages_group('display_week'))
         print('=== Finished Pages by Week ===')
         print(self.finished_pages('display_week'))
+        print('=== Pages by Month ===')
+        print(self.pages_group('display_month'))
         print('=== Finished Pages by Month ===')
         print(self.finished_pages('display_month'))
 
@@ -183,14 +183,14 @@ recorder = Recorder(DATA_FILE)
 reporter = Reporter(DATA_FILE)
 
 parser = argparse.ArgumentParser(description='Translation Reporter')
-parser.add_argument('action', help='[r]ecord / [l]ist / [rep]ort')
+parser.add_argument('action', help='[s]tart / [l]ist / [r]eport')
 args = parser.parse_args()
 
-if args.action == 'r':
+if args.action == 's':
     recorder.start_recording()
 elif args.action == 'l':
     reporter.print_list()
-elif args.action == 'rep':
+elif args.action == 'r':
     reporter.print_report()
 else:
     print('Bad command, list valid commands with "-h"')
