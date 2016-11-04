@@ -10,8 +10,7 @@
 `time-string action-name page-position`.
 
 其中`time-string`是ISO 8601格式的字符串，
-使用`datetime.datetime.now().isoformat()`生成，（Python实现，对应的解析方法：
-`dateutil.parser.parse(time-str)`）；
+使用`datetime.datetime.now().isoformat()`生成（Python实现）。
 
 `action`是`rec/list/report`3者之一，分别代表记录事件、
 打印分析结果（文本）和显示分析报告（图片）；

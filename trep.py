@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-import argparse, sys, time
+import argparse, sys, time, itertools, datetime as dt
 from datetime import datetime
+from operator import add, sub
+from functools import reduce
 
 DATA_FILE = {'name': 'trep.dat', 'line_sep': '------\n',
         'rec_title': 'Action Records:', 'end_token': 'end' }
@@ -79,23 +81,99 @@ class Calculator:
     def __init__(self, datfile):
         self.datafile = datfile
 
-    def get_speed(self):
-        pass
+    def conv_time(self, timestr):
+        return datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S.%f")
 
-    def get_page_count(self):
-        pass
+    def build_action(self, rec):
+        lines = rec.split('\n')[:-1]
+        action = {
+            'start_time': self.conv_time(lines[0].split(' ')[0]),
+            'start_page': float(lines[0].split(' ')[2]),
+            'end_time': self.conv_time(lines[-1].split(' ')[0]),
+            'end_page': float(lines[-1].split(' ')[2])
+        }
+        action['total_span'] = action['end_time'] - action['start_time']
+        internals = [self.conv_time(line.split(' ')[0]) for line in lines[1:-1]]
+        if len(internals) % 2 > 0:
+            sys.exit('Numbers of pauses and resumes are not matched at page position %s' % action['start_page'])
+        action['pauses'] = list(map(sub, internals[1::2], internals[::2]))
+        action['translation_time'] = action['total_span'] \
+                if len(action['pauses']) == 0 else \
+                action['total_span'] - reduce(add, action['pauses'])
+        action['pages'] = action['end_page'] - action['start_page']
+        action['speed'] = action['pages'] * 3600 * 24 \
+                / action['translation_time'].total_seconds()
+        # use pages/day as the speed unit instead of pages/second
+        return action
 
-    def get_total_pages(self):
-        pass
+    def get_report(self):
+        records = open(self.datafile['name']).read().split(self.datafile['line_sep'])[1:-1]
+        return list(map(self.build_action, records))
 
 
 class Reporter:
     def __init__(self, datfile):
         self.datafile = datfile
 
-    def print_list(self):
-        pass
+    def getMonday(self, theday):
+        delta = theday.isocalendar()[2] - 1
+        monday = theday - dt.timedelta(days=delta)
+        return '%s (%sth)' % (monday.strftime("%m-%d"), theday.isocalendar()[1])
 
+
+    def add_display_tags(self, rec):
+        rec['display_id'] = rec['start_time'].strftime("%m-%d %H:%M")
+        rec['display_day'] = rec['start_time'].strftime("%m-%d")
+        rec['display_week'] = self.getMonday(rec['start_time'])
+        rec['display_month'] = rec['start_time'].strftime("%y.%m")
+        return rec
+
+    def build_records(self):
+        cal = Calculator(self.datafile)
+        return list(map(self.add_display_tags, cal.get_report()))
+
+    def get_speed(self):
+        speeds = [{'ID': rec['display_id'], 'Speed': round(rec['speed'], 2),
+            'Pages': round(rec['pages'])} for rec in self.build_records()]
+        return speeds
+
+    def pages_group(self, key):
+        page_per_day = [(rec[key], round(rec['pages']))
+                for rec in self.build_records()]
+        result = []
+        for key, group in itertools.groupby(page_per_day, lambda x: x[0]):
+            total_pages = reduce(add, [rec[1] for rec in group])
+            result.append((key, total_pages))
+        return result
+
+    def finished_pages(self, key):
+        pages = self.pages_group(key)
+        finished = 0
+        fp = []
+        for p in pages:
+            finished = finished + p[1]
+            fp.append((p[0], finished))
+        return fp
+
+    def print_list(self):
+        print('=== Speed Report ===')
+        for rec in self.get_speed():
+            print('%s: ' % rec['ID'], end='', flush=True)
+            print('%s %s, ' % (rec['Pages'], 'pages'), end='', flush=True)
+            print('%s %s' % (rec['Speed'], 'pages/d'), end='', flush=True)
+            print()
+        print('=== Pages by Day ===')
+        print(self.pages_group('display_day'))
+        print('=== Pages by Week ===')
+        print(self.pages_group('display_week'))
+        print('=== Pages by Month ===')
+        print(self.pages_group('display_month'))
+        print('=== Finished Pages by Day ===')
+        print(self.finished_pages('display_day'))
+        print('=== Finished Pages by Week ===')
+        print(self.finished_pages('display_week'))
+        print('=== Finished Pages by Month ===')
+        print(self.finished_pages('display_month'))
 
     def print_report(self):
         pass
