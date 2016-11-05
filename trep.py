@@ -3,6 +3,9 @@ from datetime import datetime
 from operator import add, sub
 from functools import reduce
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 DATA_FILE = {'name': 'trep.dat', 'line_sep': '------\n',
         'rec_title': 'Action Records:', 'end_token': 'end' }
 
@@ -174,8 +177,86 @@ class Reporter:
         print('=== Finished Pages by Month ===')
         print(self.finished_pages('display_month'))
 
+    def get_total_pages(self):
+        return int(open(self.datafile['name']).readlines()[1].split(': ')[1].strip())
+
     def print_report(self):
-        pass
+        fig = plt.figure(1)
+        fig.canvas.set_window_title('Trep Report')
+
+        # speed report
+        plt.subplot(421)
+        plt.ylabel('speed (pages/day)')
+        speeds_and_pages = self.get_speed()
+        xs = range(0, len(speeds_and_pages))
+        speeds = [x['Speed'] for x in speeds_and_pages]
+        plt.ylim(0, max(speeds) + 1)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.plot(xs, speeds, color='blue', linewidth=2.5, marker='o')
+
+        plt.subplot(423)
+        plt.ylabel('pages per action')
+        pages = [x['Pages'] for x in speeds_and_pages]
+        plt.xlabel('Action Time')
+        plt.ylim(0, max(pages) + 1)
+        plt.xticks(xs, [x['ID'] for x in speeds_and_pages], rotation=30)
+        plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
+
+        plt.subplot(422)
+        plt.ylabel('pages per day')
+        pages_per_day = self.pages_group('display_day')
+        xs = range(0, len(pages_per_day))
+        pages = [p[1] for p in pages_per_day]
+        plt.ylim(0, max(pages) + 1)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.plot(xs, pages, color='blue', linewidth=2.5, marker='o')
+
+        plt.subplot(424)
+        plt.ylabel('total pages per day')
+        total_pages_per_day = self.finished_pages('display_day')
+        pages = [p[1] for p in total_pages_per_day]
+        plt.xlabel('Day')
+        plt.ylim(0, self.get_total_pages())
+        plt.xticks(xs, [p[0] for p in pages_per_day], rotation=0)
+        plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
+
+        plt.subplot(425)
+        plt.ylabel('pages per week')
+        pages_per_week = self.pages_group('display_week')
+        xs = range(0, len(pages_per_week))
+        pages = [p[1] for p in pages_per_week]
+        plt.ylim(0, max(pages) + 1)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.plot(xs, pages, color='blue', linewidth=2.5, marker='o')
+
+        plt.subplot(427)
+        plt.ylabel('total pages per week')
+        total_pages_per_week = self.finished_pages('display_week')
+        pages = [p[1] for p in total_pages_per_week]
+        plt.xlabel('Week')
+        plt.ylim(0, self.get_total_pages())
+        plt.xticks(xs, [p[0] for p in pages_per_week], rotation=0)
+        plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
+
+        plt.subplot(426)
+        plt.ylabel('pages per month')
+        pages_per_month = self.pages_group('display_month')
+        xs = range(0, len(pages_per_month))
+        pages = [p[1] for p in pages_per_month]
+        plt.ylim(0, max(pages) + 1)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.plot(xs, pages, color='blue', linewidth=2.5, marker='^')
+
+        plt.subplot(428)
+        plt.ylabel('total pages per month')
+        total_pages_per_month = self.finished_pages('display_month')
+        pages = [p[1] for p in total_pages_per_month]
+        plt.xlabel('Month')
+        plt.ylim(0, self.get_total_pages())
+        plt.xticks(xs, [p[0] for p in pages_per_month], rotation=0)
+        plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
+
+        plt.show()
 
 
 recorder = Recorder(DATA_FILE)

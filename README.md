@@ -41,8 +41,6 @@ Action Records:
 
 ## Installation
 
-安装脚本`setup.sh`基于Python 3.4，在Ubuntu 14.04上验证通过。
-
 ```
 git clone https://github.com/leetschau/translation-reporter.git ~/apps/translation-reporter
 cd ~/apps/translation-reporter
@@ -59,3 +57,7 @@ cp ~/apps/translation-reporter/trep-sample.dat trep.dat
 修改`trep.dat`中的书名、总页数、页码类型后，就可以使用了：
 
 命令列表见`trep -h`.
+
+## Note
+
+在Ubuntu 14.04、Python 3.4上验证通过。
