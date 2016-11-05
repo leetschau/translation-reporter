@@ -1,1 +1,3 @@
-*.trep
+trep*.dat
+trep.sh
+pyplot/

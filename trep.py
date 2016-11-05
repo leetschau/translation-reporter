@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse, sys, time, itertools, datetime as dt
 from datetime import datetime
 from operator import add, sub
