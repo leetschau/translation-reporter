@@ -58,7 +58,7 @@ class Recorder:
         self.translating()
 
     def translating(self):
-        PRINT_INV = 3
+        PRINT_INV = 60
         try:
             while True:
                 time.sleep(PRINT_INV)
@@ -103,9 +103,9 @@ class Calculator:
                 if len(action['pauses']) == 0 else \
                 action['total_span'] - reduce(add, action['pauses'])
         action['pages'] = action['end_page'] - action['start_page']
-        action['speed'] = action['pages'] * 3600 * 24 \
+        action['speed'] = action['pages'] * 3600 \
                 / action['translation_time'].total_seconds()
-        # use pages/day as the speed unit instead of pages/second
+        # use pages/hour as the speed unit instead of pages/second
         return action
 
     def get_report(self):
@@ -135,8 +135,11 @@ class Reporter:
         return list(map(self.add_display_tags, cal.get_report()))
 
     def get_speed(self):
-        speeds = [{'ID': rec['display_id'], 'Speed': round(rec['speed'], 2),
-            'Pages': round(rec['pages'])} for rec in self.build_records()]
+        speeds = [{'ID': rec['display_id'],
+                   'Speed': round(rec['speed'], 2),
+                   'Pages': round(rec['pages'], 1),
+                   'time': round(rec['translation_time'].seconds / 60, 1)
+                  } for rec in self.build_records()]
         return speeds
 
     def pages_group(self, key):
@@ -162,7 +165,8 @@ class Reporter:
         for rec in self.get_speed():
             print('%s: ' % rec['ID'], end='', flush=True)
             print('%s %s, ' % (rec['Pages'], 'pages'), end='', flush=True)
-            print('%s %s' % (rec['Speed'], 'pages/d'), end='', flush=True)
+            print('%s %s, ' % (rec['time'], 'minutes'), end='', flush=True)
+            print('%s %s' % (rec['Speed'], 'pages/hr'), end='', flush=True)
             print()
         print('=== Pages by Day ===')
         print(self.pages_group('display_day'))
@@ -186,7 +190,7 @@ class Reporter:
 
         # speed report
         plt.subplot(421)
-        plt.ylabel('speed (pages/day)')
+        plt.ylabel('speed (pages/hr)')
         speeds_and_pages = self.get_speed()
         xs = range(0, len(speeds_and_pages))
         speeds = [x['Speed'] for x in speeds_and_pages]
