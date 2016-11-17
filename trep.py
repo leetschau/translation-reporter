@@ -120,7 +120,7 @@ class Reporter:
     def getMonday(self, theday):
         delta = theday.isocalendar()[2] - 1
         monday = theday - dt.timedelta(days=delta)
-        return '%s (%sth)' % (monday.strftime("%m-%d"), theday.isocalendar()[1])
+        return '%s(%s)' % (theday.isocalendar()[1], monday.strftime("%m-%d"))
 
 
     def add_display_tags(self, rec):
@@ -185,17 +185,22 @@ class Reporter:
         return int(open(self.datafile['name']).readlines()[1].split(': ')[1].strip())
 
     def print_report(self):
-        fig = plt.figure(1)
-        fig.canvas.set_window_title('Trep Report')
+        fig = plt.figure()
+        main_title = 'Trep Report'
+        fig.canvas.set_window_title(main_title)
+        plt.suptitle(main_title, size=30)
 
         # speed report
-        plt.subplot(421)
+        ax = plt.subplot(421)
         plt.ylabel('speed (pages/hr)')
         speeds_and_pages = self.get_speed()
         xs = range(0, len(speeds_and_pages))
         speeds = [x['Speed'] for x in speeds_and_pages]
         plt.ylim(0, max(speeds) + 1)
-        plt.tick_params(bottom='off', labelbottom='off')
+        plt.xticks(xs)
+        ax.set_xticklabels([x['ID'][:-3] for x in speeds_and_pages], rotation=10, size=9)
+        #ax.xaxis.tick_top()
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, speeds, color='blue', linewidth=2.5, marker='o')
 
         plt.subplot(423)
@@ -203,7 +208,9 @@ class Reporter:
         pages = [x['Pages'] for x in speeds_and_pages]
         plt.xlabel('Action Time')
         plt.ylim(0, max(pages) + 1)
-        plt.xticks(xs, [x['ID'] for x in speeds_and_pages], rotation=30)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.xlim(0, len(xs) -1)
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
 
         plt.subplot(422)
@@ -212,7 +219,8 @@ class Reporter:
         xs = range(0, len(pages_per_day))
         pages = [p[1] for p in pages_per_day]
         plt.ylim(0, max(pages) + 1)
-        plt.tick_params(bottom='off', labelbottom='off')
+        plt.xticks(xs, [p[0] for p in pages_per_day], rotation=0)
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, pages, color='blue', linewidth=2.5, marker='o')
 
         plt.subplot(424)
@@ -221,7 +229,8 @@ class Reporter:
         pages = [p[1] for p in total_pages_per_day]
         plt.xlabel('Day')
         plt.ylim(0, self.get_total_pages())
-        plt.xticks(xs, [p[0] for p in pages_per_day], rotation=0)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
 
         plt.subplot(425)
@@ -230,7 +239,8 @@ class Reporter:
         xs = range(0, len(pages_per_week))
         pages = [p[1] for p in pages_per_week]
         plt.ylim(0, max(pages) + 1)
-        plt.tick_params(bottom='off', labelbottom='off')
+        plt.xticks(xs, [p[0] for p in pages_per_week], rotation=0)
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, pages, color='blue', linewidth=2.5, marker='o')
 
         plt.subplot(427)
@@ -239,7 +249,8 @@ class Reporter:
         pages = [p[1] for p in total_pages_per_week]
         plt.xlabel('Week')
         plt.ylim(0, self.get_total_pages())
-        plt.xticks(xs, [p[0] for p in pages_per_week], rotation=0)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
 
         plt.subplot(426)
@@ -248,7 +259,8 @@ class Reporter:
         xs = range(0, len(pages_per_month))
         pages = [p[1] for p in pages_per_month]
         plt.ylim(0, max(pages) + 1)
-        plt.tick_params(bottom='off', labelbottom='off')
+        plt.xticks(xs, ['20' + p[0] for p in pages_per_month], rotation=0)
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, pages, color='blue', linewidth=2.5, marker='^')
 
         plt.subplot(428)
@@ -257,7 +269,8 @@ class Reporter:
         pages = [p[1] for p in total_pages_per_month]
         plt.xlabel('Month')
         plt.ylim(0, self.get_total_pages())
-        plt.xticks(xs, [p[0] for p in pages_per_month], rotation=0)
+        plt.tick_params(bottom='off', labelbottom='off')
+        plt.grid(b=True, which='both', color='0.65',linestyle='--')
         plt.plot(xs, pages, color='red', linewidth=2.5, marker='o')
 
         plt.show()
