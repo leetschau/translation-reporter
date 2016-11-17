@@ -1,4 +1,4 @@
-# Translation Reporter
+# TRanslation rEPorter
 
 记录翻译数据，计算翻译速度，汇总翻译进度。
 
